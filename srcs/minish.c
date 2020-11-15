@@ -6,11 +6,12 @@
 #include "prompt.h"
 #include "exec.h"
 #include "lex.h"
+#include "split.h"
 
 int			main(void)
 {
 	char	*line;
-	char	**split;
+	t_parser	split;
 	int		*desc;
 	while (1)
 	{
@@ -21,7 +22,14 @@ int			main(void)
 		line = lex();
 		if (line == NULL)
 			break ;
-		// split = str_split(line, " \t\n", desc);
+		split = str_split(line, " \t\n");
+		t_node *node = split.head;
+		while (node)
+		{
+			printf("[%d:%s]-->",node->desc, node->word);		
+			node = node->next;
+		}
+		printf("\n");
 		// line에서 space, tab, newline을 기준으로 단어를 제거해준다.
 		// 단, "", ''으로 묶여있는 건 하나의 문자열로 반환한다.
 		// 또한, || && | &와 같은 기호는 자리를 하나 차지한다.
