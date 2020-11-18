@@ -4,10 +4,11 @@
 */
 
 #ifndef SPLIT_H
-
+# define SPLIT_H
 # include <string.h>
 # include <stdio.h>
 # include <stdlib.h>
+
 typedef struct		s_node
 {
 	char			*word;

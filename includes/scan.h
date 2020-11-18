@@ -4,6 +4,7 @@
 */
 
 #ifndef SCAN_H
+# define SCAN_H
 
 # include "unistd.h"
 # include "string.h"

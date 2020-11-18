@@ -10,7 +10,9 @@ ORIG_HEAD	=	minish.h \
 				prompt.h \
 				scan.h \
 				lex.h \
-				split.h
+				split.h \
+				exec.h \
+				pipe.h
 
 HEAD		=	${addprefix ${PATH_HEAD}, ${ORIG_HEAD}}
 ORIG_SRCS	=	minish.c \
@@ -18,7 +20,9 @@ ORIG_SRCS	=	minish.c \
 				tools/scan.c \
 				prompt.c \
 				lex.c \
-				tools/split.c 
+				tools/split.c \
+				exec.c \
+				pipe.c
 SRCS		=	${addprefix ${PATH_SRCS}, ${ORIG_SRCS}}
 OBJS		=	${SRCS:.c=.o}
 				

@@ -5,44 +5,133 @@
 
 #include "exec.h"
 
-int		exec(char **split, int *desc)
+#include <unistd.h>
+#include <fcntl.h>
+
+#define EXIT_COMMAND 1
+#define PATH_BUFFER_SIZE 1024
+
+extern char	**environ;
+extern int	quit;
+extern int	last_status;
+char	**make_argu(t_node *parser_head)
+{
+	t_node	*node;
+	int		cnt;
+	char	**ret;
+	int		i;
+	int		len;
+
+	cnt = 0;
+	node = parser_head;
+	while (node)
+	{
+		if (node->desc >= 1 && node->desc <= 4)
+		{
+			cnt++;
+		}
+		else
+			break ;
+		node = node->next;
+	}
+	ret = malloc(sizeof(char *) * (cnt + 1));
+	ret[cnt] = NULL;
+	i = 0;
+	node = parser_head;
+	while (i < cnt)
+	{
+		ret[i] = strdup(node->word);
+		node = node->next;
+		i++;
+	}
+	return (ret);
+}
+
+char		*exec(t_node *parser_head)
 {
 	int		i;
 	pid_t	pid;
 	int		pid_status;
+	t_node	*next;	
+	int		last;
+	int		error;
 
 	i = 0;
-	if (1)
+	error = 0;
+	last = 0;
+	next = check_pipe(parser_head, &last, &error);
+	if (error == 1)
+		return (next->word);
+	if (next == NULL)
+		return (NULL);
+	//check_redir();
+	char path[100] = "./srcs/bin/";
+	strcat(path, parser_head->word);
+	char **argu = make_argu(parser_head);
+	int fd = open("test.txt", O_WRONLY |O_CREAT |O_APPEND, 0666);
+	if (!strcmp(parser_head->word, "path"))
 	{
-		pid = fork();
-		if (pid == -1)
+		dprintf(fd, "[cmd]path\n");
+		if (argu[1] == NULL)
 		{
-			// TODO: error
-		}
-		else if (pid == 0)
-		{
-			// child process
-			if (check_pipe())
-			{
-				// if pipe exist in front of the present desc
-				// if it is, the two process returned 
-			}
-			exit(1);
+			dprintf(STDOUT_FILENO, "%s\n", getenv("PATH"));
 		}
 		else
 		{
-			// parent process
-			waitpid(pid, &pid_status, 0);
-			if (WIFEXITED(pid_status))
-			{
-				// normal child process return. 
-				// child process returend non-0 value.
-			}
-			else
-			{
-				// other case
-			}
-			
+			setenv("PATH", argu[1], 1);
 		}
+		
+		if (last == 1)
+			return (NULL);
+		exit(EXIT_SUCCESS);
 	}
+	else if (!strcmp(parser_head->word, "cd"))
+	{
+		dprintf(fd, "[cmd]cd\n");
+		char cdpath[PATH_BUFFER_SIZE];
+
+		if (argu[1] == NULL)
+		{
+			chdir(getenv("HOME"));
+		}
+		else
+		{
+			getcwd(cdpath, sizeof(cdpath));
+			strcat(cdpath, "/");
+			strcat(cdpath, argu[1]);
+			chdir(cdpath);
+		}
+		if (last == 1)
+			return (NULL);
+		exit(EXIT_SUCCESS);
+	}
+	else if (!strcmp(parser_head->word, "status"))
+	{
+		dprintf(fd, "[cmd]status\n");
+		dprintf(STDOUT_FILENO, "%d\n", last_status);
+		if (last == 1)
+			return (NULL);
+		exit(EXIT_SUCCESS);
+	}
+	else if (!strcmp(parser_head->word, "quit"))
+	{
+		dprintf(fd, "[cmd]quit\n");
+		quit = 1;
+		if (last == 1)
+			return (NULL);
+		exit(EXIT_SUCCESS);
+	}
+	else if (execve(path, argu, NULL) == -1)
+	{
+		//printf("minish: command not found: %s\n", parser_head->word);
+		//ft_cmd_not_found(parser_head->word);
+		if (last == 1)
+		{
+			dprintf(fd, "%s\n", parser_head->word);
+			return (parser_head->word);
+		}
+		exit(EXIT_FAILURE);
+	}
+	//dprintf(fd, "?\n");
+	return (NULL);
 }

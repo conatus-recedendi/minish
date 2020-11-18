@@ -4,8 +4,13 @@
 */
 
 #ifndef EXEC_H
+# define EXEC_H
 
 # include "lex.h"
+# include "pipe.h"
+# include "minish.h"
+# include "split.h"
 
-int		exec(char **split, int *desc);
+char	*exec(t_node *parser_head);
+
 #endif

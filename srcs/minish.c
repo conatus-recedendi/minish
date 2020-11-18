@@ -6,13 +6,21 @@
 #include "prompt.h"
 #include "exec.h"
 #include "lex.h"
-#include "split.h"
+#include "pipe.h"
+#include <unistd.h>
+#include <fcntl.h>
 
 int			main(void)
 {
 	char	*line;
 	t_parser	split;
 	int		*desc;
+	int		exit_status;
+	char	*error_cmd;
+
+	exit_status = 0;
+	std_fd[STDIN_FILENO] = dup(STDIN_FILENO);
+	std_fd[STDOUT_FILENO] = dup(STDOUT_FILENO);
 	while (1)
 	{
 		if (prompt())
@@ -38,7 +46,27 @@ int			main(void)
 		// 예를 들어, des[0] = 1이면, split[0]의 문자열은 cmd임을 나타낸다.
 		// 만약에, *(zero or more arbitrarty character), ?(one arbitrary character)
 		// 를 구현하고자하면, 여기서 모두 처리해주어야 함.
-		// exec(split, desc);
+		if ((error_cmd = exec(split.head)) != NULL)
+		{
+			dup2(std_fd[STDOUT_FILENO], STDOUT_FILENO);
+			printf("minish: command not found: %s\n", error_cmd);
+			last_status = 1;
+		}
+		else
+			last_status = 0;
+		// restore stdin, stdout
+		dup2(std_fd[STDIN_FILENO], STDIN_FILENO);
+		dup2(std_fd[STDOUT_FILENO], STDOUT_FILENO);
+		if (quit)
+			break ;
+		/*
+		node = split.head;
+		while ((node = check_pipe(node)) != NULL)
+		{
+			exec(split.head);
+		}
+		*/
+		//exec(check_pipe(split.head));
 		// execute the command.
 		// This doesn't implement exact shell syntax.
 		// So, I don't make the general rules.

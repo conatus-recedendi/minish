@@ -57,6 +57,8 @@ t_parser		str_split(const char *line, const char *set)
 	// 3. & | " ' 기호가 cmd 위치에 존재할 경우 에러
 	// 4. * ? 는 찾기 전에 미리 변환. 즉, exec 단계가 아니라 여기서 완료해야 함.
 	// 5. 
+	ret.head = NULL;
+	ret.tail = NULL;
 	quote = 0;
 	is_cmd = 0;
 	dup = strdup(line); // line cannot be modified.
@@ -65,6 +67,7 @@ t_parser		str_split(const char *line, const char *set)
 	ret.tail = NULL;
 	// cmd loop
 	// && 등으로 분리되는 명령마다 한 번 씩.
+	//printf("%s\n", line);
 	while (*(dup + i))
 	{
 		is_cmd = 0;
@@ -217,10 +220,8 @@ t_parser		str_split(const char *line, const char *set)
 				ret.tail = node;
 			}
 			i++;
-			/*
 			while (check_set(*(dup + i), set))
 				i++;
-				*/
 		}
 	}
 	
