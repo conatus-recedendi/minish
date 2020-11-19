@@ -165,6 +165,14 @@ char		*exec(t_node *parser_head)
 			return (NULL);
 		exit(EXIT_SUCCESS);
 	}
+	else if (!strcmp(parser_head->word, "jobs"))
+	{
+
+	}
+	else if (!strcmp(parser_head->word, "kjob"))
+	{
+		
+	}
 	else if (!strcmp(parser_head->word, "cd"))
 	{
 		char cdpath[PATH_BUFFER_SIZE];
@@ -228,7 +236,9 @@ char		*exec(t_node *parser_head)
 		int	status;
 		waitpid(pid, &status, 0);
 		if (256 * 1 == status && last == 1)
+		{
 			return (parser_head->word);
+		}
 		if (256 * 1 == status)
 		{
 			exit(EXIT_FAILURE);

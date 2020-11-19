@@ -4,7 +4,14 @@
 */
 
 #include "split.h"
+#include <dirent.h>
+#include <fnmatch.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <stdio.h>
+#include "minish.h"
 
+extern int			quit;
 // end wasn't included.
 static	char		*strdup_ptr(char *start, char *end)
 {
@@ -50,6 +57,8 @@ t_parser		str_split(const char *line, const char *set)
 	int			quote;
 	int			desc;
 	int			end_cmd;
+	int			flag;
+	int			wildcard;
 
 	// 문자열을 나누는 기준을 정해보자. 
 	// 1. dquote, quote가 처음 열린 상태에서 동일한 기호가 나타날 때까지 반복.
@@ -57,6 +66,7 @@ t_parser		str_split(const char *line, const char *set)
 	// 3. & | " ' 기호가 cmd 위치에 존재할 경우 에러
 	// 4. * ? 는 찾기 전에 미리 변환. 즉, exec 단계가 아니라 여기서 완료해야 함.
 	// 5. 
+	flag = 0;
 	ret.head = NULL;
 	ret.tail = NULL;
 	quote = 0;
@@ -78,6 +88,7 @@ t_parser		str_split(const char *line, const char *set)
 		// 띄어쓰기나 "" 등으로 분리되는 단어마다 한 번 씩
 		while (end_cmd && *(dup + i))
 		{
+			flag = 0;
 			while (check_set(*(dup + i), set))
 			{
 				i++;
@@ -195,14 +206,71 @@ t_parser		str_split(const char *line, const char *set)
 				while (!check_set(*(dup + i), set))
 					i++;
 				word = strdup_ptr(pptr, dup + i);
+				DIR				*mydir;
+   				struct dirent	*myfile;
+				char			buf[512];
+				int				i;
+
+				mydir = opendir(".");
+				i = 0;
 				desc = 4;
 				if (!is_cmd)
 				{
 					is_cmd = 1;
 					desc = 1;
 				}
+				wildcard = 0;
+				while (*(word + i))
+				{
+					if (check_set(*(word + i), "*?"))
+						wildcard = 1;
+					i++;
+				}
+				if (wildcard)
+				{
+					while ((myfile = readdir(mydir)) != NULL)
+					{
+						if (strcmp(myfile->d_name, word) && !fnmatch(word, myfile->d_name, 0))
+						{
+							desc = 4;
+							if (!is_cmd)
+							{
+								is_cmd = 1;
+								desc = 1;
+							}
+							if (ret.head == NULL)
+							{
+								t_node 	*node;
+
+								node = malloc(sizeof(t_node));
+								node->desc = desc;
+								node->word = myfile->d_name;
+								node->next = NULL;
+								ret.head = node;
+								ret.tail = node;
+							}
+							else
+							{
+								t_node	*node;
+
+								node = malloc(sizeof(t_node));
+								node->desc = desc;
+								node->word = myfile->d_name;
+								node->next = NULL;
+								ret.tail->next = node;
+								ret.tail = node;
+							}
+							flag = 1;
+						}
+					}
+				}
+				if (flag == 0)
+				{
+					dprintf(STDERR_FILENO, "minish: no matches found: %s\n", word);
+					quit = 1;
+				}
 			}
-			if (ret.head == NULL)
+			if (!wildcard && ret.head == NULL)
 			{
 				t_node 	*node;
 
@@ -213,7 +281,7 @@ t_parser		str_split(const char *line, const char *set)
 				ret.head = node;
 				ret.tail = node;
 			}
-			else
+			else if (!wildcard)
 			{
 				t_node	*node;
 

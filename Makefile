@@ -27,7 +27,8 @@ ORIG_SRCS	=	minish.c \
 
 BIN			=	cat.c \
 				wc.c \
-				ls.c
+				ls.c \
+				sleep.c
 
 SRCS		=	${addprefix ${PATH_SRCS}, ${ORIG_SRCS}}
 OBJS		=	${SRCS:.c=.o}
