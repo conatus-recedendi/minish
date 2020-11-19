@@ -14,6 +14,7 @@
 extern char	**environ;
 extern int	quit;
 extern int	last_status;
+extern char path[2048];
 char	**make_argu(t_node *parser_head)
 {
 	t_node	*node;
@@ -129,6 +130,7 @@ char		*exec(t_node *parser_head)
 	t_node	*next;	
 	int		last;
 	int		error;
+	char	*dpath;
 
 	i = 0;
 	error = 0;
@@ -144,8 +146,8 @@ char		*exec(t_node *parser_head)
 			return (NULL);
 		exit(EXIT_FAILURE);
 	}
-	char path[100] = "./srcs/bin/";
-	strcat(path, parser_head->word);
+	dpath = strdup(path);
+	strcat(dpath, parser_head->word);
 	char **argu = make_argu(parser_head);
 	if (!strcmp(parser_head->word, "path"))
 	{
@@ -217,7 +219,7 @@ char		*exec(t_node *parser_head)
 		pid = fork();
 		if (pid == 0)
 		{
-			if (execve(path, argu, NULL) == -1)
+			if (execve(dpath, argu, NULL) == -1)
 			{
 				dprintf(STDERR_FILENO, "minish: command not found: %s\n", parser_head->word);
 				exit(EXIT_FAILURE);

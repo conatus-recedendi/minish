@@ -35,6 +35,8 @@ int			main(void)
 	int		exit_status;
 	char	*error_cmd;
 
+	strcat(path, getenv("PWD"));
+	strcat(path, "/srcs/bin/");
 	signal(SIGINT, sig_int_handler);
 	exit_status = 0;
 	std_fd[STDIN_FILENO] = dup(STDIN_FILENO);

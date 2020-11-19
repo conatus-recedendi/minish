@@ -119,7 +119,6 @@ void		print_n(char *path)
 
 	status = stat(path, &st_buf);
 	mydir = opendir(path);
-	dprintf(STDERR_FILENO, "%s %d: %d:\n", path, S_ISDIR(st_buf.st_mode), S_ISREG(st_buf.st_mode));
 	if (!S_ISDIR(st_buf.st_mode) && !S_ISREG(st_buf.st_mode) )
 	{
 		dprintf(STDERR_FILENO, "%s: %s: No such file or directory\n", "ls", path);

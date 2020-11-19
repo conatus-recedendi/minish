@@ -22,5 +22,6 @@ int			std_fd[2];
 int			quit;
 int			error;
 int			wildcard_error;
+char		path[2048];
 
 #endif
