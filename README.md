@@ -10,9 +10,9 @@ It remakes "zsh", but some(many) part are different because of the requirements 
 
 ## Privacy
 
-> Name	: 이경규
-> ID	: 20195122
-> Data	: 2020.11.19(Thu)
+- Name	: 이경규
+- ID	: 20195122
+- Data	: 2020.11.19(Thu)
 
 ## How to Compile and How to execute?
 
