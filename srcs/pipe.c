@@ -43,7 +43,10 @@ t_node		*check_pipe(t_node *head, int *last, int *error)
 
 				// parent process with pipe
 				dup2(fd[0], STDIN_FILENO);
+				close(fd[1]);
 				waitpid(pid, &state, 0);
+				int fds = open("test.txt", O_WRONLY | O_APPEND, 0666);
+				dprintf(fds, "woww  : %d\n", state);
 				if (state == 256 * 1)
 				{
 					int fd = open("test.txt",O_WRONLY | O_APPEND , 0666);
@@ -57,11 +60,11 @@ t_node		*check_pipe(t_node *head, int *last, int *error)
 					*error = 1;
 					return (temp);
 				}
+				//dprintf(fd, "three\n");
 				close(fd[1]);
-				close(0);
+				close(fd[0]);
 				return (EXIT_SUCCESS);
 			}
-			printf("tetet\n");
 			// TODO : deal with pipe
 			exit(EXIT_SUCCESS);
 		}

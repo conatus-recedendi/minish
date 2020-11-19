@@ -9,7 +9,28 @@
 #include "pipe.h"
 #include <unistd.h>
 #include <fcntl.h>
+#include <signal.h>
 
+void		sig_int_handler(int sig_num)
+{
+	write(STDOUT_FILENO, "\n", 1);
+	prompt();
+	return ;
+}
+
+void		init_parser(t_parser *p)
+{
+	t_node	*node;
+
+	while (p->head)
+	{
+		node = p->head;
+		p->head = p->head->next;
+		free(node);
+	}
+	p->head = NULL;
+	p->tail = NULL;
+}
 int			main(void)
 {
 	char	*line;
@@ -17,21 +38,32 @@ int			main(void)
 	int		*desc;
 	int		exit_status;
 	char	*error_cmd;
+	int		fd[2];
 
+//	sigaction(SIGINT, &(struct sigaction){ .sa_handler = sig_int_handler }, NULL);
+	signal(SIGINT, sig_int_handler);
 	exit_status = 0;
 	std_fd[STDIN_FILENO] = dup(STDIN_FILENO);
 	std_fd[STDOUT_FILENO] = dup(STDOUT_FILENO);
+	pipe(fd);
+	
+	pipe(fd);
+	dup2(STDERR_FILENO, fd[0]);
+	dup2(std_fd[STDOUT_FILENO], fd[1]);
 	while (1)
 	{
 		if (prompt())
 			return (1);
+		init_parser(&split);
 		// print current directory path in a prompt.
 		// It depend on the current environment value.
 		line = lex();
 		if (line == NULL)
 			break ;
 		split = str_split(line, " \t\n");
+		//printf("%s\n", line);
 		t_node *node = split.head;
+		// debug
 		while (node)
 		{
 			printf("[%d:%s]-->",node->desc, node->word);		
@@ -49,7 +81,7 @@ int			main(void)
 		if ((error_cmd = exec(split.head)) != NULL)
 		{
 			dup2(std_fd[STDOUT_FILENO], STDOUT_FILENO);
-			printf("minish: command not found: %s\n", error_cmd);
+			//dprintf(STDERR_FILENO, "minish: command not found: %s\n", error_cmd);
 			last_status = 1;
 		}
 		else

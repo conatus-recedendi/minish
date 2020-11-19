@@ -68,6 +68,8 @@ t_parser		str_split(const char *line, const char *set)
 	// cmd loop
 	// && 등으로 분리되는 명령마다 한 번 씩.
 	//printf("%s\n", line);
+	while (check_set(*(dup + i), set))
+		i++;
 	while (*(dup + i))
 	{
 		is_cmd = 0;
@@ -77,10 +79,12 @@ t_parser		str_split(const char *line, const char *set)
 		while (end_cmd && *(dup + i))
 		{
 			while (check_set(*(dup + i), set))
+			{
 				i++;
+			}
 			if (is_cmd == 0 && check_set(*(dup + i), "&|<>"))
 			{
-				printf("parse error near <temp>\n");
+				printf("parse error near %c\n", *(dup + i));
 				// parse error near '<error message>'
 				// actual : error message
 				// & : &
@@ -91,6 +95,7 @@ t_parser		str_split(const char *line, const char *set)
 				// < : \n
 				// > : \n
 				// >> : \n
+				return (ret);
 			}
 			else if (check_set(*(dup + i), "&|<>"))
 			{

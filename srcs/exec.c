@@ -121,16 +121,39 @@ char		*exec(t_node *parser_head)
 			return (NULL);
 		exit(EXIT_SUCCESS);
 	}
-	else if (execve(path, argu, NULL) == -1)
+	else 
 	{
-		//printf("minish: command not found: %s\n", parser_head->word);
-		//ft_cmd_not_found(parser_head->word);
-		if (last == 1)
+		pid = fork();
+		if (pid == 0)
 		{
-			dprintf(fd, "%s\n", parser_head->word);
-			return (parser_head->word);
+			if (execve(path, argu, NULL) == -1)
+			{
+				dprintf(STDERR_FILENO, "minish: command not found: %s\n", parser_head->word);
+				//ft_cmd_not_found(parser_head->word);
+				dprintf(fd, "one\n");
+				/*
+				if (last == 1)
+				{
+					return (parser_head->word);
+				}
+				*/
+				exit(EXIT_FAILURE);
+			}
+			exit(0);
 		}
-		exit(EXIT_FAILURE);
+		dprintf(fd, "two\n");
+		int	status;
+		waitpid(pid, &status, 0);
+		if (256 * 1 == status && last == 1)
+			return (parser_head->word);
+		if (256 * 1 == status)
+		{
+			exit(EXIT_FAILURE);
+		}
+		dprintf(fd, "four\n");
+		if (last == 1)
+			return (NULL);
+		exit(EXIT_SUCCESS);
 	}
 	//dprintf(fd, "?\n");
 	return (NULL);
