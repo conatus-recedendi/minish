@@ -35,7 +35,6 @@ char		*line_append(const char *des, const char *append)
 char		*get_line(int fd)
 {
 	char	*ret;
-	int		temp;
 
 	ret = malloc(sizeof(char) * (SCAN_LEN_MAX + 1));
 	ret[SCAN_LEN_MAX] = 0;

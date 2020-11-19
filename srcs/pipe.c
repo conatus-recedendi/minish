@@ -4,9 +4,6 @@
 */
 
 #include "pipe.h"
-#include <unistd.h>
-#include <fcntl.h>
-
 
 t_node		*check_pipe(t_node *head, int *last, int *error)
 {
@@ -27,21 +24,14 @@ t_node		*check_pipe(t_node *head, int *last, int *error)
 			pipe(fd);
 			temp = temp->next;
 			pid = fork();
-			if (pid < 0)
-			{
-				// TODO : error pipe
-			}
-			else if (pid == 0)
+			if (pid == 0)
 			{
 				dup2(fd[1], STDOUT_FILENO);
 				close(fd[0]);
-				// TODO : child process with pipe
 				return (head);
 			}
 			else
 			{
-
-				// parent process with pipe
 				dup2(fd[0], STDIN_FILENO);
 				close(fd[1]);
 				waitpid(pid, &state, 0);
@@ -55,12 +45,10 @@ t_node		*check_pipe(t_node *head, int *last, int *error)
 					*error = 1;
 					return (temp);
 				}
-				//dprintf(fd, "three\n");
 				close(fd[1]);
 				close(fd[0]);
 				return (EXIT_SUCCESS);
 			}
-			// TODO : deal with pipe
 			exit(EXIT_SUCCESS);
 		}
 		temp = temp->next;

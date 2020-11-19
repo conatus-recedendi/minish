@@ -39,7 +39,7 @@ int		main(int argc, char *argv[])
 			else
 			{
 				dprintf(STDERR_FILENO, "%s: %s: No such file or directory\n", argv[0], argv[i]);
-				exit(2);
+				exit(1);
 			}
 			i++;
 		}

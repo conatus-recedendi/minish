@@ -5,10 +5,12 @@
 
 #include "print.h"
 
+/*
 static void	itoa(int n, char *buf)
 {
 
 }
+*/
 
 int			print_str(int fd, const char *str)
 {
@@ -18,6 +20,7 @@ int			print_str(int fd, const char *str)
 	return (write(fd, str, size));
 }
 
+/*
 int			print_int(int fd, const int num)
 {
 	int		size;
@@ -26,3 +29,4 @@ int			print_int(int fd, const int num)
 	itoa(num, buf);
 	return(print_str(fd, buf));
 }
+*/

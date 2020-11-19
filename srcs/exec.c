@@ -20,7 +20,6 @@ char	**make_argu(t_node *parser_head)
 	int		cnt;
 	char	**ret;
 	int		i;
-	int		len;
 
 	cnt = 0;
 	node = parser_head;
@@ -47,7 +46,6 @@ char	**make_argu(t_node *parser_head)
 	return (ret);
 }
 
-// 오류없을 시 0, 오류가 있을 시 1
 int		check_redir(t_node *parser_head, int *last)
 {
 	t_node	*temp;
@@ -128,7 +126,6 @@ char		*exec(t_node *parser_head)
 {
 	int		i;
 	pid_t	pid;
-	int		pid_status;
 	t_node	*next;	
 	int		last;
 	int		error;
@@ -171,7 +168,7 @@ char		*exec(t_node *parser_head)
 	}
 	else if (!strcmp(parser_head->word, "kjob"))
 	{
-		
+
 	}
 	else if (!strcmp(parser_head->word, "cd"))
 	{
@@ -189,6 +186,7 @@ char		*exec(t_node *parser_head)
 			if (chdir(cdpath) == -1)
 			{
 				dprintf(STDERR_FILENO, "%s: no such file or directory: %s\n", "cd", cdpath);
+				last_status = 1;
 				if (last)
 				{
 					return (parser_head->word);
@@ -222,13 +220,6 @@ char		*exec(t_node *parser_head)
 			if (execve(path, argu, NULL) == -1)
 			{
 				dprintf(STDERR_FILENO, "minish: command not found: %s\n", parser_head->word);
-				//ft_cmd_not_found(parser_head->word);
-				/*
-				if (last == 1)
-				{
-					return (parser_head->word);
-				}
-				*/
 				exit(EXIT_FAILURE);
 			}
 			exit(0);
@@ -247,6 +238,5 @@ char		*exec(t_node *parser_head)
 			return (NULL);
 		exit(EXIT_SUCCESS);
 	}
-	//dprintf(fd, "?\n");
 	return (NULL);
 }

@@ -4,16 +4,10 @@
 */
 
 #include "split.h"
-#include <dirent.h>
-#include <fnmatch.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <stdio.h>
-#include "minish.h"
 
-extern int			quit;
-// end wasn't included.
-static	char		*strdup_ptr(char *start, char *end)
+extern int			wildcard_error;
+
+char			*strdup_ptr(char *start, char *end)
 {
 	char			*ret;
 	int				i;
@@ -31,7 +25,7 @@ static	char		*strdup_ptr(char *start, char *end)
 	return (ret);
 }
 
-static	int	check_set(char c, const char *set)
+int			check_set(char c, const char *set)
 {
 	int		i;
 
@@ -45,6 +39,7 @@ static	int	check_set(char c, const char *set)
 	return (0);
 }
 
+
 t_parser		str_split(const char *line, const char *set)
 {
 	t_parser	ret;
@@ -52,7 +47,6 @@ t_parser		str_split(const char *line, const char *set)
 	char		*pptr;
 	char		*word;
 	int			i;
-	int			special;
 	int			is_cmd;
 	int			quote;
 	int			desc;
@@ -60,32 +54,21 @@ t_parser		str_split(const char *line, const char *set)
 	int			flag;
 	int			wildcard;
 
-	// 문자열을 나누는 기준을 정해보자. 
-	// 1. dquote, quote가 처음 열린 상태에서 동일한 기호가 나타날 때까지 반복.
-	// 2. 각 명령어 줄의 시작은 cmd.
-	// 3. & | " ' 기호가 cmd 위치에 존재할 경우 에러
-	// 4. * ? 는 찾기 전에 미리 변환. 즉, exec 단계가 아니라 여기서 완료해야 함.
-	// 5. 
 	flag = 0;
 	ret.head = NULL;
 	ret.tail = NULL;
 	quote = 0;
 	is_cmd = 0;
-	dup = strdup(line); // line cannot be modified.
+	dup = strdup(line);
 	i = 0;
 	ret.head = NULL;
 	ret.tail = NULL;
-	// cmd loop
-	// && 등으로 분리되는 명령마다 한 번 씩.
-	//printf("%s\n", line);
 	while (check_set(*(dup + i), set))
 		i++;
 	while (*(dup + i))
 	{
 		is_cmd = 0;
-		// word loop
 		end_cmd = 1;
-		// 띄어쓰기나 "" 등으로 분리되는 단어마다 한 번 씩
 		while (end_cmd && *(dup + i))
 		{
 			flag = 0;
@@ -208,7 +191,6 @@ t_parser		str_split(const char *line, const char *set)
 				word = strdup_ptr(pptr, dup + i);
 				DIR				*mydir;
    				struct dirent	*myfile;
-				char			buf[512];
 				int				i;
 
 				mydir = opendir(".");
@@ -264,10 +246,10 @@ t_parser		str_split(const char *line, const char *set)
 						}
 					}
 				}
-				if (flag == 0)
+				if (wildcard && flag == 0)
 				{
 					dprintf(STDERR_FILENO, "minish: no matches found: %s\n", word);
-					quit = 1;
+					wildcard_error = 1;
 				}
 			}
 			if (!wildcard && ret.head == NULL)

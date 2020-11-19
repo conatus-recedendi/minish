@@ -7,7 +7,7 @@
 #include "scan.h"
 #include "lex.h"
 
-int		isspace(char c)
+int		is_space(char c)
 {
 	if (c == ' ' || c == '\t' || c == '\n')
 		return (1);
@@ -36,7 +36,7 @@ int		check_newline(char *line, int *index, int bf)
 		}
 		else if (line[i] == flag)
 			flag = 0;
-		if (!isspace(line[i]) && !first_flag)
+		if (!is_space(line[i]) && !first_flag)
 			first_flag = 1;
 		if (first_flag == 1 && i > 0)
 		{
@@ -44,9 +44,9 @@ int		check_newline(char *line, int *index, int bf)
 				last_flag = 1; // and
 			else if (line[i - 1] == '|' && line[i] == '|')
 				last_flag = 2; // or
-			else if (isspace(line[i - 1]) && line[i] == '|')
+			else if (is_space(line[i - 1]) && line[i] == '|')
 				last_flag = 3; // pipe
-			else if (!isspace(line[i]))
+			else if (!is_space(line[i]))
 				last_flag = 0;
 		}
 		i++;
@@ -90,7 +90,6 @@ char		*lex(void)
 	if ((cmd = get_line(STDIN_FILENO)) == NULL)
 	{
 		return (NULL);
-		// cannot read by some reasons.
 	}
 	fd = 1;
 	index = 0;
@@ -99,7 +98,6 @@ char		*lex(void)
 	{
 		if ((line = get_line(STDIN_FILENO)) == NULL)
 		{
-			//cannot read by some reasons.
 			return (NULL);
 		}
 		cmd = line_append(cmd, line);

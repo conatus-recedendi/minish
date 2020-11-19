@@ -6,6 +6,8 @@
 #ifndef SCAN_H
 # define SCAN_H
 
+# include <stdlib.h>
+
 # include "unistd.h"
 # include "string.h"
 

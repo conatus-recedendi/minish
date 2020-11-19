@@ -1,7 +1,7 @@
 
 NAME		=	minish
 CC			=	gcc
-CFLAGS		=	
+CFLAGS		=	-Wall -Werror -Wextra
 PATH_HEAD	=	./includes/
 PATH_SRCS	=	./srcs/
 PATH_BIN	=	./srcs/bin/

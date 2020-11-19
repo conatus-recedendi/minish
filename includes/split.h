@@ -5,9 +5,17 @@
 
 #ifndef SPLIT_H
 # define SPLIT_H
+
 # include <string.h>
 # include <stdio.h>
 # include <stdlib.h>
+# include <dirent.h>
+# include <fnmatch.h>
+# include <stdlib.h>
+# include <unistd.h>
+# include <stdio.h>
+
+
 
 typedef struct		s_node
 {
@@ -36,9 +44,9 @@ typedef struct		s_parser
 	t_node			*tail;
 }					t_parser;
 
-static	char		*strdup_ptr(char *start, char *end);
-static	int	check_set(char c, const char *set);
-t_parser		str_split(const char *line, const char *set);
+char				*strdup_ptr(char *start, char *end);
+int					check_set(char c, const char *set);
+t_parser			str_split(const char *line, const char *set);
 
 
 

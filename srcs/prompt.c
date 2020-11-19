@@ -14,7 +14,6 @@ int			prompt(void)
 	temp = getcwd(prompt, MAX_LEN_PROMPT);
 	if (temp == NULL)
 	{
-		//error causes. prompt cannot print.
 		free(prompt);
 		return(ERROR_PROMPT_PRINT);
 	}
