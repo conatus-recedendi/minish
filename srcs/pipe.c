@@ -45,13 +45,8 @@ t_node		*check_pipe(t_node *head, int *last, int *error)
 				dup2(fd[0], STDIN_FILENO);
 				close(fd[1]);
 				waitpid(pid, &state, 0);
-				int fds = open("test.txt", O_WRONLY | O_APPEND, 0666);
-				dprintf(fds, "woww  : %d\n", state);
 				if (state == 256 * 1)
 				{
-					int fd = open("test.txt",O_WRONLY | O_APPEND , 0666);
-
-					dprintf(fd, "what??\n");
 					*error = 1;
 					return (head);
 				}

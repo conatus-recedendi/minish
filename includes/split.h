@@ -26,7 +26,7 @@ typedef struct		s_node
 	// 11 : |
 	// 12 : &&
 	// 13 : ||
-	// 14 : & (background)
+	//
 	struct s_node	*next;
 }					t_node;
 

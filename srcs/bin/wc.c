@@ -25,9 +25,6 @@ int	main(int argc, char *argv[])
 	int	state;
 	int	fd;
 
-	int debug = open("test.txt", O_WRONLY |O_CREAT |O_APPEND, 0666);
-	dprintf(debug, "wc start\n");
-
 	sbytes = 0;
 	sword = 0;
 	sline = 0;
@@ -55,8 +52,6 @@ int	main(int argc, char *argv[])
 				state = 0;
 			}
 		}
-		dprintf(debug, "hiendddddd\n");
-		dprintf(debug, "%8d%8d%8d\n", sline, sword, sbytes);
 		printf("%8d%8d%8d\n", sline, sword, sbytes);
     }
     else
@@ -93,6 +88,5 @@ int	main(int argc, char *argv[])
 		}
 		printf("%8d%8d%8d\n", sline, sword, sbytes);
     }
-	dprintf(debug, "wc end\n");
     exit(0);
 }

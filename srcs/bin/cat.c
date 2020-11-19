@@ -15,8 +15,7 @@ int		main(int argc, char *argv[])
 	int	fd;
 	char	buf[BUF_SIZE];
 	int	size;
-	int debug = open("test.txt", O_WRONLY |O_CREAT |O_APPEND, 0666);
-	dprintf(debug, "cat start\n");
+
 	buf[1] = 0;
 	i = 1;
 	if (argc == 1)
@@ -45,6 +44,6 @@ int		main(int argc, char *argv[])
 			i++;
 		}
 	}
-	dprintf(debug, "cat end\n");
+	printf("\n");
 	exit(0);
 }

@@ -47,6 +47,83 @@ char	**make_argu(t_node *parser_head)
 	return (ret);
 }
 
+// 오류없을 시 0, 오류가 있을 시 1
+int		check_redir(t_node *parser_head, int *last)
+{
+	t_node	*temp;
+	int		fd;
+	int		pid;
+	int		status;
+
+	temp = parser_head;
+	while (temp && temp->desc != 11)
+	{
+		if (temp->desc == 6)
+		{
+			// >
+			fd = open(temp->word, O_WRONLY | O_CREAT, 0666);
+			if (fd < 0)
+			{
+				dprintf(STDERR_FILENO, "minish: no such file or directory: %s\n", temp->word);
+				if (*last)
+					return (1);
+				exit(EXIT_FAILURE);
+			}
+			pid = fork();
+			if (pid == 0)
+			{
+				dup2(fd, STDOUT_FILENO);
+				*last = 0;
+				return (0);
+			}
+			waitpid(pid, NULL, 0);
+			close(fd);
+			if (status == 256 * 1 || *last)
+				return (1);
+		}
+		else if (temp->desc == 8)
+		{
+			// <
+			fd = open(temp->word, O_RDONLY, 0666);
+			if (fd < 0)
+			{
+				dprintf(STDERR_FILENO, "minish: no such file or directory: %s\n", temp->word);
+				if (*last)
+					return (1);
+				exit(EXIT_FAILURE);
+			}
+			dup2(fd, STDIN_FILENO);
+			close(fd);
+
+		}
+		else if (temp->desc == 10)
+		{
+			// >>
+			fd = open(temp->word, O_WRONLY | O_CREAT | O_APPEND, 0666);
+			if (fd < 0)
+			{
+				dprintf(STDERR_FILENO, "minish: no such file or directory: %s\n", temp->word);
+				if (*last)
+					return (1);
+				exit(EXIT_FAILURE);
+			}
+			pid = fork();
+			if (pid == 0)
+			{
+				dup2(fd, STDOUT_FILENO);
+				*last = 0;
+				return (0);
+			}
+			waitpid(pid, &status, 0);
+			close(fd);
+			if (status == 256 * 1 || *last)
+				return (1);
+		}
+		temp = temp->next;
+	}
+	return (0);
+}
+
 char		*exec(t_node *parser_head)
 {
 	int		i;
@@ -64,14 +141,17 @@ char		*exec(t_node *parser_head)
 		return (next->word);
 	if (next == NULL)
 		return (NULL);
-	//check_redir();
+	if (check_redir(parser_head, &last))
+	{
+		if (last == 1)
+			return (NULL);
+		exit(EXIT_FAILURE);
+	}
 	char path[100] = "./srcs/bin/";
 	strcat(path, parser_head->word);
 	char **argu = make_argu(parser_head);
-	int fd = open("test.txt", O_WRONLY |O_CREAT |O_APPEND, 0666);
 	if (!strcmp(parser_head->word, "path"))
 	{
-		dprintf(fd, "[cmd]path\n");
 		if (argu[1] == NULL)
 		{
 			dprintf(STDOUT_FILENO, "%s\n", getenv("PATH"));
@@ -87,7 +167,6 @@ char		*exec(t_node *parser_head)
 	}
 	else if (!strcmp(parser_head->word, "cd"))
 	{
-		dprintf(fd, "[cmd]cd\n");
 		char cdpath[PATH_BUFFER_SIZE];
 
 		if (argu[1] == NULL)
@@ -99,7 +178,15 @@ char		*exec(t_node *parser_head)
 			getcwd(cdpath, sizeof(cdpath));
 			strcat(cdpath, "/");
 			strcat(cdpath, argu[1]);
-			chdir(cdpath);
+			if (chdir(cdpath) == -1)
+			{
+				dprintf(STDERR_FILENO, "%s: no such file or directory: %s\n", "cd", cdpath);
+				if (last)
+				{
+					return (parser_head->word);
+				}
+				exit(EXIT_FAILURE);
+			}
 		}
 		if (last == 1)
 			return (NULL);
@@ -107,7 +194,6 @@ char		*exec(t_node *parser_head)
 	}
 	else if (!strcmp(parser_head->word, "status"))
 	{
-		dprintf(fd, "[cmd]status\n");
 		dprintf(STDOUT_FILENO, "%d\n", last_status);
 		if (last == 1)
 			return (NULL);
@@ -115,7 +201,6 @@ char		*exec(t_node *parser_head)
 	}
 	else if (!strcmp(parser_head->word, "quit"))
 	{
-		dprintf(fd, "[cmd]quit\n");
 		quit = 1;
 		if (last == 1)
 			return (NULL);
@@ -130,7 +215,6 @@ char		*exec(t_node *parser_head)
 			{
 				dprintf(STDERR_FILENO, "minish: command not found: %s\n", parser_head->word);
 				//ft_cmd_not_found(parser_head->word);
-				dprintf(fd, "one\n");
 				/*
 				if (last == 1)
 				{
@@ -141,7 +225,6 @@ char		*exec(t_node *parser_head)
 			}
 			exit(0);
 		}
-		dprintf(fd, "two\n");
 		int	status;
 		waitpid(pid, &status, 0);
 		if (256 * 1 == status && last == 1)
@@ -150,7 +233,6 @@ char		*exec(t_node *parser_head)
 		{
 			exit(EXIT_FAILURE);
 		}
-		dprintf(fd, "four\n");
 		if (last == 1)
 			return (NULL);
 		exit(EXIT_SUCCESS);

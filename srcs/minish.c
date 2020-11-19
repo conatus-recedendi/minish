@@ -64,12 +64,14 @@ int			main(void)
 		//printf("%s\n", line);
 		t_node *node = split.head;
 		// debug
+		/*
 		while (node)
 		{
 			printf("[%d:%s]-->",node->desc, node->word);		
 			node = node->next;
 		}
 		printf("\n");
+		*/
 		// line에서 space, tab, newline을 기준으로 단어를 제거해준다.
 		// 단, "", ''으로 묶여있는 건 하나의 문자열로 반환한다.
 		// 또한, || && | &와 같은 기호는 자리를 하나 차지한다.
